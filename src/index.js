@@ -1,6 +1,6 @@
-import * as dotenv from "dotenv";
+import { config as dotEnvConfig } from "dotenv";
 
-dotenv.config();
+dotEnvConfig();;
 
 console.log(process.env.BITTREX_API_KEY);
 
