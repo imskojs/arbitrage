@@ -20,6 +20,7 @@
     "uglify-es": "^3.3.9"
   },
   "scripts": {
+    "start": "npx rollup -c && node ./build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
