@@ -9,7 +9,7 @@ export default {
     file: './build/index.js',
     format: 'cjs'
   },
-  onwarn: (waning) => {
+  onwarn: (warning) => {
     console.warn(warning.message);
   },
   plugins: [
