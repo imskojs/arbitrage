@@ -1,5 +1,4 @@
 import nodeResolve from "rollup-plugin-node-resolve";
-import commonjs from "rollup-plugin-commonjs";
 import uglify from "rollup-plugin-uglify";
 import { minify } from "uglify-es";
 
@@ -14,9 +13,6 @@ export default {
   },
   plugins: [
     nodeResolve({ jsnext: true, main: true }),
-    commonjs({
-      include: ['node_modules/rxjs/**']
-    }),
     uglify({}, minify)
   ]
 };
