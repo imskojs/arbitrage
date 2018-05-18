@@ -1,24 +1,18 @@
 import { config as dotEnvConfig } from "dotenv";
-
-import request from "request";
-
 dotEnvConfig();
 
-const {
-  BITTREX_API_KEY,
-  BITTREX_API_SECRET
-} = process.env
+import * as Bittrex from "./utils/bittrexAPI";
 
-function getMarkets() {
-  // return observable
-  request({
-    method: 'GET',
-    uri: 'https://bittrex.com/api/v1.1/public/getmarkets'
-  }, function (err, res, body) {
-    console.log(body)
-  })
-}
+const { BITTREX_API_KEY, BITTREX_API_SECRET } = process.env;
 
-getMarkets()
+// getMarkets()
+//   .subscribe(body => console.log(body));
+
+// Bittrex.getMarketHistory(`BTC-LTC`)
+//   .subscribe(
+//     body => console.log(body),
+//     err => console.log('aaaa', err)
+//   );
+
 
 

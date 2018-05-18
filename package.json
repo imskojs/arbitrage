@@ -16,7 +16,9 @@
     "babel-preset-env": "^1.7.0"
   },
   "scripts": {
-    "start": "babel src --out-dir build && node ./build/index.js",
+    "build": "babel src --out-dir build",
+    "start": "node ./build/index.js",
+    "watch": "babel src --watch --out-dir build --source-maps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
