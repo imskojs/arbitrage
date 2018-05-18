@@ -1,3 +1,5 @@
+import builtins from "rollup-plugin-node-builtins";
+import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from "rollup-plugin-node-resolve";
 import uglify from "rollup-plugin-uglify";
 import { minify } from "uglify-es";
@@ -12,7 +14,13 @@ export default {
     console.warn(warning.message);
   },
   plugins: [
+    builtins(),
     nodeResolve(),
+    commonjs({
+      include: [
+        'dotenv'
+      ].map(lib => `node_modules/${lib}/**`)
+    }),
     uglify({}, minify)
   ]
 };
