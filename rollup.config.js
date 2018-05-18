@@ -14,7 +14,12 @@ export default {
   },
   plugins: [
     nodeResolve({ jsnext: true, main: true }),
-    commonjs({ include: ['node_modules/rxjs/**'] }),
+    commonjs({
+      include: [
+        'node_modules/rxjs/**',
+        'node_modules/lodash/**'
+      ]
+    }),
     uglify({}, minify)
   ]
 };
