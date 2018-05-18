@@ -12,7 +12,7 @@ export default {
     console.warn(warning.message);
   },
   plugins: [
-    nodeResolve({ jsnext: true, main: true }),
+    nodeResolve(),
     uglify({}, minify)
   ]
 };
