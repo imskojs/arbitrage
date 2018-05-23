@@ -6,6 +6,7 @@
   "dependencies": {
     "crypto-js": "^3.1.9-1",
     "dotenv": "^5.0.1",
+    "lodash": "^4.17.10",
     "nonce": "^1.0.4",
     "ramda": "^0.25.0",
     "request": "^2.86.0",

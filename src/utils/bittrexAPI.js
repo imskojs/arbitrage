@@ -13,7 +13,26 @@ const API_KEY = process.env.BITTREX_API_KEY;
 const API_SECRET = process.env.BITTREX_API_SECRET;
 
 // Used to get the open and available trading markets at Bittrex along with other meta data.
-export function getMarkets() {
+// export function getmarkets() {
+//   const getmarkets$ = requestfactory({
+//     method: `get`,
+//     uri: `https://bittrex.com/api/v1.1/public/getmarkets`,
+//     json: true
+//   });
+
+//   return getmarkets$
+//     .pipe(
+//       map(([res, body]) => {
+//         if (!body.success) {
+//           throw new error(`getmarkets get: ${body.message}`);
+//         } else {
+//           return body.result;
+//         }
+//       }),
+//       map(results => r.map(r.pick([`marketname`, `mintradesize`, `notice`, `isactive`]), results))
+//     );
+// }
+export function getMarkets(baseCurrency = `BTC`) {
   const getMarkets$ = requestFactory({
     method: `GET`,
     uri: `https://bittrex.com/api/v1.1/public/getmarkets`,
@@ -29,9 +48,22 @@ export function getMarkets() {
           return body.result;
         }
       }),
-      map(results => R.map(R.pick([`MarketName`, `MinTradeSize`, `Notice`, `IsActive`]), results))
+      map(
+        R.filter(R.whereEq({ BaseCurrency: baseCurrency, IsActive: true }))
+      ),
+      map(
+        R.map(symbolObj => `${symbolObj.MarketCurrency}/${symbolObj.BaseCurrency}`)
+      )
     );
 }
+
+
+// map(
+//   R.filter(R.whereEq({ quoteAsset: `BTC`, status: `TRADING` }))
+// ),
+//   map(
+//     R.map((symbolObj) => `${symbolObj.baseAsset}/${symbolObj.quoteAsset}`)
+//   )
 
 
 // Used to get all supported currencies at Bittrex along with other meta data.
@@ -124,10 +156,15 @@ export function getMarketSummary(market) {
 
 
 // Used to get retrieve the orderbook for a given market.
-export function getOrderbook(market) {
+// market = LTC/BTC
+export function getOrderbook(market, exchange) {
+  const newMarket = market.split('/').reverse().join('-');
+  if (newMarket.length < 1) {
+    throw Error('Market symbol wrong');
+  }
   const getMarketSummary$ = requestFactory({
     method: `GET`,
-    uri: `https://bittrex.com/api/v1.1/public/getorderbook?market=${market}&type=both`,
+    uri: `https://bittrex.com/api/v1.1/public/getorderbook?market=${newMarket}&type=both`,
     json: true
   });
 
@@ -139,6 +176,9 @@ export function getOrderbook(market) {
         } else {
           return body.result;
         }
+      }),
+      map(result => {
+        return { bids: result.buy, asks: result.sell, market, exchange }
       })
     )
 }
@@ -411,61 +451,6 @@ export function getDepositHistory(currency) {
       //TODO::
     );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
