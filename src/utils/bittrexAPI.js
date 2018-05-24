@@ -171,14 +171,18 @@ export function getOrderbook(market, exchange) {
   return getMarketSummary$
     .pipe(
       map(([res, body]) => {
-        if (!body.success) {
-          throw new Error(`getOderbook GET: ${body.message}`);
-        } else {
-          return body.result;
-        }
+        return body.result;
       }),
       map(result => {
-        return { bids: result.buy, asks: result.sell, market, exchange }
+        let buy = []
+        let sell = []
+        if (result && result.buy) {
+          buy = result.buy
+        }
+        if (result && result.sell) {
+          sell = result.sell
+        }
+        return { bids: buy, asks: sell, market, exchange }
       })
     )
 }

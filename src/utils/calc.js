@@ -73,6 +73,36 @@ function moreBidQuantity(currentAskQuantity, currentBidQuantity) {
   return (currentAskQuantity < currentBidQuantity);
 }
 
+// Some exchanges require buying quantity to be upto certain decimal place depending on price
+export function buyingQuantity(rawBuyingRate, rawBuyingQuantity) {
+  let buyingQuantity = 0
+  if (rawBuyingRate < 0.001) {
+    buyingQuantity = floor(rawBuyingQuantity);
+  } else if (rawBuyingRate < 0.01) {
+    buyingQuantity = floor(rawBuyingQuantity, 1);
+  } else if (rawBuyingRate < 0.1) {
+    buyingQuantity = floor(rawBuyingQuantity, 2);
+  } else if (rawBuyingRate < 1) {
+    buyingQuantity = floor(rawBuyingQuantity, 3);
+  }
+  return buyingQuantity;
+}
+
+// Some exchange require price to be certain decimal place depending on the price itself.
+export function priceLength(price) {
+  let priceLength = 4;
+  if (+price < 0.0001) {
+    priceLength = 8
+  } else if (+price < 0.001) {
+    priceLength = 7
+  } else if (+price < 0.01) {
+    priceLength = 6
+  } else if (+price < 0.1) {
+    priceLength = 5
+  }
+  return priceLength;
+}
+
 
 
 

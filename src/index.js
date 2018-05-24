@@ -39,16 +39,9 @@ zip(
       const market = binance.market;
       const resultTwo = calc.rateAndQuantityToBuy(bittrexBids, binanceAsks, 0.005, market, `bittrex`, `binance`)
       if (resultTwo.BTCValue >= 0.002) {
-        let buyingQuantity = 0
-        if (resultTwo.buyingRate < 0.001) {
-          buyingQuantity = floor(resultTwo.buyingQuantity);
-        } else if (resultTwo.buyingRate < 0.01) {
-          buyingQuantity = floor(resultTwo.buyingQuantity, 1);
-        } else if (resultTwo.buyingRate < 0.1) {
-          buyingQuantity = floor(resultTwo.buyingQuantity, 2);
-        } else if (resultTwo.buyingRate < 1) {
-          buyingQuantity = floor(resultTwo.buyingQuantity, 3);
-        }
+        let buyingQuantity = calc.buyingQuantity(resultTwo.buyingRate, resultTwo.buyingQuantity);
+        console.log(`Buying ${buyingQuantity} of ${market} @ ${resultTwo.buyingRate}
+TotalBTCValue is ${resultTwo.BTCValue}`);
         return Binance.buyLimit(market, buyingQuantity, resultTwo.buyingRate)
       } else {
         return of(resultTwo);
@@ -57,8 +50,8 @@ zip(
     mergeMap(orderOrResult => {
       if (orderOrResult.orderId) {
         let { symbol, executedQty, price } = orderOrResult;
-        let priceString = '' + floor(+price, 8);
-        let priceLength = priceString.split('.')[1].length
+        let priceLength = calc.priceLength(price);
+
         return Binance.sellLimit(symbol, +executedQty, floor(+price * 1.005, priceLength))
       } else {
         return of(orderOrResult);
