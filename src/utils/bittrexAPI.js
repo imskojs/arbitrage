@@ -12,26 +12,108 @@ const requestFactory = bindNodeCallback(request);
 const API_KEY = process.env.BITTREX_API_KEY;
 const API_SECRET = process.env.BITTREX_API_SECRET;
 
-// Used to get the open and available trading markets at Bittrex along with other meta data.
-// export function getmarkets() {
-//   const getmarkets$ = requestfactory({
-//     method: `get`,
-//     uri: `https://bittrex.com/api/v1.1/public/getmarkets`,
-//     json: true
-//   });
+// Used to get retrieve the orderbook for a given market.
+export function getOrderbook(market) {
+  const newMarket = market.split('/').reverse().join('-');
+  if (newMarket.length < 1) {
+    throw Error('Market symbol wrong');
+  }
+  const getMarketSummary$ = requestFactory({
+    method: `GET`,
+    uri: `https://bittrex.com/api/v1.1/public/getorderbook?market=${newMarket}&type=both`,
+    json: true
+  });
 
-//   return getmarkets$
-//     .pipe(
-//       map(([res, body]) => {
-//         if (!body.success) {
-//           throw new error(`getmarkets get: ${body.message}`);
-//         } else {
-//           return body.result;
-//         }
-//       }),
-//       map(results => r.map(r.pick([`marketname`, `mintradesize`, `notice`, `isactive`]), results))
-//     );
-// }
+  return getMarketSummary$
+    .pipe(
+      map(([res, body]) => {
+        return body.result;
+      }),
+      map(result => {
+        let buy = []
+        let sell = []
+        if (result && result.buy) { buy = result.buy }
+        if (result && result.sell) { sell = result.sell }
+        return {
+          bids: buy,
+          asks: sell,
+          market,
+          exchange: `bittrex`
+        };
+      })
+    )
+}
+
+// Used to place a buy order in a specific market. Use buylimit to place limit orders. Make sure you have the proper permissions set on your API keys for this call to work.
+export function buyLimit(market, quantity, rate) {
+  // market argument LTC/BTC
+  // Uses format BTC-LTC for market
+  const newMarket = market.split('/').reverse().join('-');
+  const uri = `https://bittrex.com/api/v1.1/market/buylimit?apikey=${API_KEY}&nonce=${n()}&market=${newMarket}&quantity=${quantity}&rate=${rate}`;
+  const apisign = hmacSHA512(uri, API_SECRET);
+  const buyLimit$ = requestFactory({
+    method: `GET`,
+    uri,
+    json: true,
+    headers: { apisign }
+  });
+
+  return buyLimit$
+    .pipe(
+      map(R.path([1])), // {success, message, result: {uuid}}
+      map(body => {
+        if (body && body.success) {
+          return {
+            orderId: R.path([`result`, `uuid`], body),
+            symbol: newMarket,
+            executedQty: quantity,
+            price: rate,
+            message: body.message,
+            exchange: `bittrex`
+          }
+        } else {
+          return body
+        }
+      })
+    );
+}
+
+
+
+// Used to place an sell order in a specific market. Use selllimit to place limit orders. Make sure you have the proper permissions set on your API keys for this call to work.
+export function sellLimit(market, quantity, rate) {
+  // market argument here is of form BTC-LTC
+  const uri = `https://bittrex.com/api/v1.1/market/sellLimit?apikey=${API_KEY}&nonce=${n()}&market=${market}&quantity=${quantity}&rate=${rate}`;
+  const apisign = hmacSHA512(uri, API_SECRET);
+  const sellLimit$ = requestFactory({
+    method: `GET`,
+    uri,
+    json: true,
+    headers: { apisign }
+  });
+
+  return sellLimit$
+    .pipe(
+      map(R.path([1])),
+      map(body => {
+        if (body && body.success) {
+          return {
+            orderId: R.path([`result`, `uuid`], body),
+            symbol: market,
+            origQty: quantity,
+            price: rate,
+            message: body.message,
+            exchange: `bittrex`
+          }
+        } else {
+          return body
+        }
+
+      })
+    );
+}
+
+
 export function getMarkets(baseCurrency = `BTC`) {
   const getMarkets$ = requestFactory({
     method: `GET`,
@@ -58,12 +140,6 @@ export function getMarkets(baseCurrency = `BTC`) {
 }
 
 
-// map(
-//   R.filter(R.whereEq({ quoteAsset: `BTC`, status: `TRADING` }))
-// ),
-//   map(
-//     R.map((symbolObj) => `${symbolObj.baseAsset}/${symbolObj.quoteAsset}`)
-//   )
 
 
 // Used to get all supported currencies at Bittrex along with other meta data.
@@ -155,37 +231,6 @@ export function getMarketSummary(market) {
 
 
 
-// Used to get retrieve the orderbook for a given market.
-// market = LTC/BTC
-export function getOrderbook(market, exchange) {
-  const newMarket = market.split('/').reverse().join('-');
-  if (newMarket.length < 1) {
-    throw Error('Market symbol wrong');
-  }
-  const getMarketSummary$ = requestFactory({
-    method: `GET`,
-    uri: `https://bittrex.com/api/v1.1/public/getorderbook?market=${newMarket}&type=both`,
-    json: true
-  });
-
-  return getMarketSummary$
-    .pipe(
-      map(([res, body]) => {
-        return body.result;
-      }),
-      map(result => {
-        let buy = []
-        let sell = []
-        if (result && result.buy) {
-          buy = result.buy
-        }
-        if (result && result.sell) {
-          sell = result.sell
-        }
-        return { bids: buy, asks: sell, market, exchange }
-      })
-    )
-}
 
 
 // Used to retrieve the latest trades that have occured for a specific market.
@@ -210,41 +255,6 @@ export function getMarketHistory(market) {
 }
 
 
-// Used to place a buy order in a specific market. Use buylimit to place limit orders. Make sure you have the proper permissions set on your API keys for this call to work.
-export function buyLimit(market, quantity, rate) {
-  const uri = `https://bittrex.com/api/v1.1/market/buylimit?apikey=${API_KEY}&nonce=${n()}&market=${market}&quantity=${quantity}&rate=${rate}`;
-  const apisign = hmacSHA512(uri, API_SECRET);
-  const buyLimit$ = requestFactory({
-    method: `GET`,
-    uri,
-    json: true,
-    headers: { apisign }
-  });
-
-  return buyLimit$
-    .pipe(
-      //TODO::
-    );
-}
-
-
-
-// Used to place an sell order in a specific market. Use selllimit to place limit orders. Make sure you have the proper permissions set on your API keys for this call to work.
-export function sellLimit(market, quantity, rate) {
-  const uri = `https://bittrex.com/api/v1.1/market/sellLimit?apikey=${API_KEY}&nonce=${n()}&market=${market}&quantity=${quantity}&rate=${rate}`;
-  const apisign = hmacSHA512(uri, API_SECRET);
-  const sellLimit$ = requestFactory({
-    method: `GET`,
-    uri,
-    json: true,
-    headers: { apisign }
-  });
-
-  return sellLimit$
-    .pipe(
-      //TODO::
-    );
-}
 
 // Used to cancel a buy or sell order.
 export function cancel(uuid) {
