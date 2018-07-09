@@ -12,16 +12,53 @@ const calc = require("./utils/calc")
 
 const baseMarket = `BTC`;
 const intervalInMiliseconds = 200;
+const VARIABLE_LIMIT = 0.20; // 20% variance coins (24hours) excluded
+
+const IN_DEV = false;
 
 of(1).pipe(
   delay(intervalInMiliseconds),
   mergeMap(_ => {
     return zip(
       Binance.getMarkets(baseMarket),
-      Bittrex.getMarkets(baseMarket)
+      Bittrex.getMarkets(baseMarket),
+      Bittrex.getCurrencies(),
+      Bittrex.getMarketSummaries()
     )
   }),
-  map(([binancePairs, bittrexPairs]) => R.intersection(binancePairs, bittrexPairs)),
+  map(([binancePairs, bittrexPairs, bittrexCurrencies, bittrexSummaries]) => {
+    // Remove Inactive Currencies
+    const inactiveBittrex = bittrexCurrencies
+      .filter((obj) => obj.IsActive === false)
+      .map(obj => obj.Currency);
+
+    inactiveBittrex.forEach(sym => {
+      const index = bittrexPairs.indexOf(`${sym}/${baseMarket}`)
+      bittrexPairs.splice(index, 1)
+    })
+
+    // Remove Too vairalbe currencies
+    const tooVariable = bittrexSummaries
+      .filter(obj => obj.MarketName.includes(`${baseMarket}-`))
+      .filter(obj => {
+        return ((obj.High - obj.Low) / obj.Low) > VARIABLE_LIMIT
+      })
+      .map(obj => {
+        const marketName = obj.MarketName.split(`-`);
+        const altSym = marketName[1];
+        return altSym
+      })
+
+    console.log(tooVariable)
+    tooVariable.forEach(sym => {
+      const index = bittrexPairs.indexOf(`${sym}/${baseMarket}`)
+      bittrexPairs.splice(index, 1)
+    })
+
+    if (IN_DEV) { return [] }
+    return R.intersection(binancePairs, bittrexPairs)
+  }),
+  // Remove TUSD
   map(pairs => R.remove(R.indexOf(`TUSD/${baseMarket}`, pairs), 1, pairs)),
   switchMap(pairsArray => {
     return zip(
@@ -46,7 +83,7 @@ of(1).pipe(
     const market = binance.market;
     // const resultOne = calc.rateAndQuantityToBuy(binanceBids, bittrexAsks, 0.0085, market, `binance`, `bittrex`)
 
-    const resultTwo = calc.rateAndQuantityToBuy(bittrexBids, binanceAsks, 0.0058, market, `bittrex`, `binance`)
+    const resultTwo = calc.rateAndQuantityToBuy(bittrexBids, binanceAsks, 0.0059, market, `bittrex`, `binance`)
     if (resultTwo.BTCValue >= 0.0015) {
       let buyingQuantity = calc.buyingQuantity(resultTwo.buyingRate, resultTwo.buyingQuantity);
       console.log(` Binance M: ${market} P: ${resultTwo.buyingRate} Q: ${buyingQuantity} T: ${resultTwo.BTCValue} `);

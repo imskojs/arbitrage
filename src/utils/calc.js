@@ -7,8 +7,8 @@ export function rateAndQuantityToBuy(bids, asks, ratio, market, bidsExchangeName
   let currentBidQuantity = false;
   let buyingRate = 0;
   let buyingQuantity = 0;
-  while (askIndex < 100 && asks[askIndex] != null) {
-    while (bidIndex < 100 && bids[bidIndex] != null) {
+  while (askIndex < 3000 && asks[askIndex] != null) {
+    while (bidIndex < 3000 && bids[bidIndex] != null) {
       if (buyCondition(asks, bids, askIndex, bidIndex, ratio)) {
         buyingRate = asks[askIndex].Rate;
         if (firstTimeRunning(currentAskQuantity, currentBidQuantity)) {
@@ -41,7 +41,7 @@ export function rateAndQuantityToBuy(bids, asks, ratio, market, bidsExchangeName
       } // if buyCondition
     } // while bidIndex
     // This line should not be executed unless we run out of bids.
-    if (bidIndex >= 99) {
+    if (bidIndex >= 2999) {
       return {
         market: `${market}`,
         buyingRate,
