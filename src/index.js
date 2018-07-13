@@ -12,7 +12,7 @@ const calc = require("./utils/calc")
 
 const baseMarket = `BTC`;
 const intervalInMiliseconds = 200;
-const VARIABLE_LIMIT = 0.20; // 20% variance coins (24hours) excluded
+const VARIABLE_LIMIT = 0.16; // 19% variance coins (24hours) excluded
 
 const IN_DEV = false;
 
@@ -49,7 +49,7 @@ of(1).pipe(
         return altSym
       })
 
-    console.log(tooVariable)
+    console.log(`too variable coins count:`, tooVariable.length)
     tooVariable.forEach(sym => {
       const index = bittrexPairs.indexOf(`${sym}/${baseMarket}`)
       bittrexPairs.splice(index, 1)
@@ -149,7 +149,7 @@ of(1).pipe(
   retryWhen(error$ => {
     return error$.pipe(
       tap(err => console.log(err)),
-      delayWhen(val => timer(300000)),
+      delayWhen(val => timer(600000)),
       scan((accum, num) => {
         if (accum > 15) {
           throw Error(`Errored more than 9 times`);

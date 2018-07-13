@@ -1,5 +1,5 @@
 // ping, 
-import { bindNodeCallback, pipe } from "rxjs";
+import { bindNodeCallback } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import R from "ramda";
 
