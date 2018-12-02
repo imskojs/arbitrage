@@ -5,5 +5,5 @@ The main goal is to maximize the number of bitcoins by arbitrage trading alt coi
 This is a working prototype.
 Use it at your own risk.
 
-# DONE
+# Done
 1. bittrex and binance arbitrage.
