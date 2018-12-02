@@ -11,7 +11,7 @@ const Bittrex = require("./utils/bittrexAPI")
 const calc = require("./utils/calc")
 
 const baseMarket = `BTC`;
-const intervalInMiliseconds = 200;
+const intervalInMiliseconds = 500;
 const VARIABLE_LIMIT = 0.16; // 19% variance coins (24hours) excluded
 
 const IN_DEV = false;
