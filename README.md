@@ -1,9 +1,16 @@
-# Arbitrage
-Arbitrage trading from as many exchanges as possible.
-The main goal is to maximize the number of bitcoins by arbitrage trading alt coins.
+# USE THIS REPO AT YOUR OWN RISK
+## TRANSLATE KOREAN IF YOU WANT TO KNOW HOW TO USE IT
 
-This is a working prototype.
-Use it at your own risk.
+# 이 리포에 관하여.
+이 리포에는 비트렉스와 바이난스에서 거례되는 수많은 알트코인들을 초단위로 확인하여 거래소끼리 차액이 있을시 자동으로 사고 팔는 프로그램이 들어 있습니다.
+본 프로그램은 비트코인의 수를 최디화 시키는 것으로 위 2개의 거래소에 0.5 비트코인씩 입금을 하시고 프로그램을 돌리시면 됩니다.
+프로그램 돌리는 방식은 위 코드를 살표보시면 쉽게 찾으실수 있을것 같습니다.
 
-# Done
-1. bittrex and binance arbitrage.
+# 사용한 기술 스텍;
+RxJS와 lodash 그리고 Ramda를 주 모듈로 사용해 알고 있는 RxJS를 최대한 활용해 보았습니다.
+(몇달뒤 다시보니 지저분하네요. 고칠것이 많네요. ㅎㅎ)
+
+# 질문은
+vxxcko@gmail.com 으로 해주세요. 감사합니다. 
+이 프로그램은 프로토타입입니다. 
+MIT Licence로 이 프로그램을 사용하여 돈을 잃으신것에 대한 책음은 프로그램 사용자에게 있다는것을 다시한번 말씀드립니다.
