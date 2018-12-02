@@ -12,7 +12,7 @@ const calc = require("./utils/calc")
 
 const baseMarket = `BTC`;
 const intervalInMiliseconds = 500;
-const VARIABLE_LIMIT = 0.16; // 19% variance coins (24hours) excluded
+const VARIABLE_LIMIT = 0.19; // 19% variance coins (24hours) excluded
 
 const IN_DEV = false;
 
