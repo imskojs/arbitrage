@@ -1,6 +1,9 @@
-# arbitrage
+# Arbitrage
 Arbitrage trading from as many exchanges as possible.
 The main goal is to maximize the number of bitcoins by arbitrage trading alt coins.
 
-# TODO:
+This is a working prototype.
+Use it at your own risk.
+
+# DONE
 1. bittrex and binance arbitrage.
